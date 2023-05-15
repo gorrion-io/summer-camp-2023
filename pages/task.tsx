@@ -7,6 +7,7 @@ const fetcher = async (url: string) => {
   const response = await fetch(url);
   return response.json();
 };
+
 export default function Task(): ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const { data, error } = useSWR(`/api/people?page=${currentPage}`, fetcher);
@@ -29,8 +30,6 @@ export default function Task(): ReactElement {
     }
   };
 
-  console.log(currentPage);
-  console.log(data.data);
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mt-8 flow-root">
