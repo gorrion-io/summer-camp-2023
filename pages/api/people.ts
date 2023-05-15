@@ -59,9 +59,10 @@ export default function handler(
 
   const users: User[] = generateRandomUsers(totalAmountOfUsers)
   const paginatedUsers: User[] = users.slice(startIndex, endIndex);
+  const sortedAndPaginatedUsers: User[] = paginatedUsers.sort((a: User, b: User) => a.name.localeCompare(b.name));
 
   const response: Response<User[]> = {
-    data: paginatedUsers,
+    data: sortedAndPaginatedUsers,
     currentPage,
     totalAmountOfPages
   };
