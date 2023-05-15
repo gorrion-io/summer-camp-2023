@@ -1,12 +1,6 @@
 import type {NextApiRequest, NextApiResponse} from "next";
 import {faker} from "@faker-js/faker";
-
-type User = {
-  name: string;
-  email: string;
-  title: string;
-  role: string;
-};
+import {User} from "@/types";
 
 type Response<T> = {
   readonly data: T;
