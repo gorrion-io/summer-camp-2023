@@ -36,14 +36,25 @@ const generateRecords = (records: number) => {
   return people.sort((a, b) => (a.name > b.name ? 1 : -1));
 };
 
+const paginate = (people: User[]) => {
+  const recsPerPage = 10;
+  const pages = Math.ceil(people.length / recsPerPage);
+  const result = [];
+
+  for (let i = 0; i < pages; i++) {
+    result.push(people.slice(i * recsPerPage, (i + 1) * recsPerPage));
+  }
+
+  return result;
+};
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
 ) {
-  const { records } = req.query;
   const { page } = req.query;
 
-  const people: Array<User> = generateRecords(Number(records));
+  const people: User[][] = paginate(generateRecords(Number(100)));
 
-  res.status(200).json(people.sort((a, b) => (a.name > b.name ? 1 : -1)));
+  res.status(200).json(people[Number(page)]);
 }
