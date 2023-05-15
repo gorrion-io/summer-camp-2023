@@ -1,15 +1,39 @@
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import type { PeopleResponse } from "./api/people";
+
+const usePeople = () => {
+  const pageSize = 10;
+
+  const [page, setPage] = useState(0);
+
+  const { data } = useQuery<PeopleResponse>({
+    queryKey: ["people", page],
+    queryFn: async () =>
+      fetch(`/api/people?page=${page}`).then((res) => res.json()),
+  });
+
+  const people = data?.peoples || [];
+  const from = page * pageSize + 1;
+  const to = from + people.length - 1;
+
+  const resultsCount = {
+    from,
+    to,
+    total: data?.total || "N",
+  };
+
+  const isNextDisabled = data?.total === to;
+
+  const goNext = () => setPage((page) => (isNextDisabled ? page : page + 1));
+  const goPrevious = () => setPage((page) => (page === 0 ? 0 : page - 1));
+
+  return { people, goNext, goPrevious, resultsCount };
+};
+
 export default function Task() {
-  /**  TODO: Create an endpoint that returns a list of people, and use that here.
-   * Use tanstack/react-query to fetch the data
-   */
-  const people = [
-    {
-      name: "Jane Cooper",
-      email: "jane@cooper.com",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
-    },
-  ];
+  const { people, goNext, goPrevious, resultsCount } = usePeople();
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mt-8 flow-root">
@@ -66,26 +90,29 @@ export default function Task() {
                 ))}
               </tbody>
             </table>
-            {/* TODO: Pagination */}
             <nav
               className="flex items-center justify-between py-3"
               aria-label="Pagination"
             >
               <div className="hidden sm:block">
                 <p className="text-sm">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">1</span> of{" "}
-                  <span className="font-medium">N</span> results
+                  Showing{" "}
+                  <span className="font-medium">{resultsCount.from}</span> to{" "}
+                  <span className="font-medium">{resultsCount.to}</span> of{" "}
+                  <span className="font-medium">{resultsCount.total}</span>{" "}
+                  results
                 </p>
               </div>
               <div className="flex flex-1 justify-between sm:justify-end">
                 <a
+                  onClick={goPrevious}
                   href="#"
                   className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
                 >
                   Previous
                 </a>
                 <a
+                  onClick={goNext}
                   href="#"
                   className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
                 >
