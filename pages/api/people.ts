@@ -1,10 +1,15 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type {NextApiRequest, NextApiResponse} from "next";
+import {faker} from "@faker-js/faker";
 
 type User = {
   name: string;
   email: string;
   title: string;
   role: string;
+};
+
+type Response = {
+ readonly data: User[];
 };
 
 /**
@@ -14,9 +19,30 @@ type User = {
  * The endpoint should accept a query parameter "page" to return the corresponding page
  */
 
+function generateRandomUsers  (totalAmountOfUsers: number): User[] {
+  const users: User[] = [];
+  for (let i:number = 0; i < totalAmountOfUsers; i++) {
+    const user: User = {
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      title: faker.person.jobTitle(),
+      role: faker.person.jobType(),
+    };
+    users.push(user);
+  }
+  return users;
+}
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
-) {
-  res.status(200).json([]);
+): void {
+  const totalAmountOfUsers: number = 100
+  const users: User[] = generateRandomUsers(totalAmountOfUsers)
+
+  const response: Response = {
+    data: users,
+  }
+
+  res.status(200).json(response);
 }
