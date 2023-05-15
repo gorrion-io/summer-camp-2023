@@ -1,6 +1,7 @@
-import type {NextApiRequest, NextApiResponse} from "next";
-import {faker} from "@faker-js/faker";
-import {User} from "@/types";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { faker } from "@faker-js/faker";
+import { User } from "@/types";
+import { TOTAL_AMOUNT_OF_USERS_PER_PAGE } from "@/constans";
 
 type Response<T> = {
   readonly data: T;
@@ -12,7 +13,7 @@ type ErrorResponse = {
   readonly error: string;
 };
 
-function generateRandomUsers  (totalAmountOfUsers: number): User[] {
+function generateRandomUsers(totalAmountOfUsers: number): User[] {
   const users: User[] = [];
   for (let i: number = 0; i < totalAmountOfUsers; i++) {
     const user: User = {
@@ -31,9 +32,10 @@ export default function handler(
   res: NextApiResponse<Response<User[]> | ErrorResponse>
 ): void {
   const { page = "1" } = req.query;
-  const usersAmountPerPage: number = 10;
   const totalAmountOfUsers: number = 100;
-  const totalAmountOfPages: number = Math.ceil(totalAmountOfUsers / usersAmountPerPage);
+  const totalAmountOfPages: number = Math.ceil(
+    totalAmountOfUsers / TOTAL_AMOUNT_OF_USERS_PER_PAGE
+  );
 
   const currentPage: number = Number(page);
   if (currentPage > totalAmountOfPages) {
@@ -41,18 +43,20 @@ export default function handler(
     return;
   }
 
-  const startIndex: number = (currentPage - 1) * usersAmountPerPage;
-  const endIndex: number = startIndex + usersAmountPerPage;
+  const startIndex: number = (currentPage - 1) * TOTAL_AMOUNT_OF_USERS_PER_PAGE;
+  const endIndex: number = startIndex + TOTAL_AMOUNT_OF_USERS_PER_PAGE;
 
-  const users: User[] = generateRandomUsers(totalAmountOfUsers)
+  const users: User[] = generateRandomUsers(totalAmountOfUsers);
   const paginatedUsers: User[] = users.slice(startIndex, endIndex);
-  const sortedAndPaginatedUsers: User[] = paginatedUsers.sort((a: User, b: User) => a.name.localeCompare(b.name));
+  const sortedAndPaginatedUsers: User[] = paginatedUsers.sort(
+    (a: User, b: User) => a.name.localeCompare(b.name)
+  );
 
   const response: Response<User[]> = {
     data: sortedAndPaginatedUsers,
     currentPage,
-    totalAmountOfPages
+    totalAmountOfPages,
   };
 
   res.status(200).json(response);
-};
+}
