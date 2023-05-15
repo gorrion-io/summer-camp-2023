@@ -29,7 +29,7 @@ Add the original repository as remote called `upstream`
 
 Open a terminal and run the following git command:
 ```bash
-git remote add upstream https://github.com/gorrion-io/winter-camp-2023.git
+git remote add upstream https://github.com/gorrion-io/summer-camp-2023.git
 ```
 
 ## Create a branch
