@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { faker } from "@faker-js/faker";
 
 type User = {
   name: string;
@@ -18,5 +19,12 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
 ) {
-  res.status(200).json([]);
+  res.status(200).json([
+    {
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      title: faker.person.jobTitle(),
+      role: faker.person.jobDescriptor(),
+    },
+  ]);
 }
