@@ -15,16 +15,35 @@ type User = {
  * The endpoint should accept a query parameter "page" to return the corresponding page
  */
 
+const generateRecords = (records: number) => {
+  const people = [];
+
+  for (let i = 0; i < Number(records); i++) {
+    let firstName = faker.person.firstName();
+    let lastName = faker.person.lastName();
+
+    people.push({
+      name: `${firstName} ${lastName}`,
+      email: faker.internet.email({
+        firstName: firstName,
+        lastName: lastName,
+      }),
+      title: faker.person.jobTitle(),
+      role: faker.person.jobDescriptor(),
+    });
+  }
+
+  return people.sort((a, b) => (a.name > b.name ? 1 : -1));
+};
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
 ) {
-  res.status(200).json([
-    {
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      title: faker.person.jobTitle(),
-      role: faker.person.jobDescriptor(),
-    },
-  ]);
+  const { records } = req.query;
+  const { page } = req.query;
+
+  const people: Array<User> = generateRecords(Number(records));
+
+  res.status(200).json(people.sort((a, b) => (a.name > b.name ? 1 : -1)));
 }
