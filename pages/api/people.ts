@@ -1,7 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { faker } from "@faker-js/faker";
 import { User } from "@/types";
-import { TOTAL_AMOUNT_OF_USERS_PER_PAGE } from "@/constans";
+import {
+  TOTAL_AMOUNT_OF_USERS,
+  TOTAL_AMOUNT_OF_USERS_PER_PAGE,
+} from "@/constans";
 
 type Response<T> = {
   readonly data: T;
@@ -13,18 +16,13 @@ type ErrorResponse = {
   readonly error: string;
 };
 
-function generateRandomUsers(totalAmountOfUsers: number): User[] {
-  const users: User[] = [];
-  for (let i: number = 0; i < totalAmountOfUsers; i++) {
-    const user: User = {
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      title: faker.person.jobTitle(),
-      role: faker.person.jobType(),
-    };
-    users.push(user);
-  }
-  return users;
+function generateRandomUsers(): User {
+  return {
+    name: faker.person.fullName(),
+    email: faker.internet.email(),
+    title: faker.person.jobTitle(),
+    role: faker.person.jobType(),
+  };
 }
 
 export default function handler(
@@ -32,9 +30,8 @@ export default function handler(
   res: NextApiResponse<Response<User[]> | ErrorResponse>
 ): void {
   const { page = "1" } = req.query;
-  const totalAmountOfUsers: number = 100;
   const totalAmountOfPages: number = Math.ceil(
-    totalAmountOfUsers / TOTAL_AMOUNT_OF_USERS_PER_PAGE
+    TOTAL_AMOUNT_OF_USERS / TOTAL_AMOUNT_OF_USERS_PER_PAGE
   );
 
   const currentPage: number = Number(page);
@@ -46,7 +43,10 @@ export default function handler(
   const startIndex: number = (currentPage - 1) * TOTAL_AMOUNT_OF_USERS_PER_PAGE;
   const endIndex: number = startIndex + TOTAL_AMOUNT_OF_USERS_PER_PAGE;
 
-  const users: User[] = generateRandomUsers(totalAmountOfUsers);
+  const users: User[] = faker.helpers.multiple(generateRandomUsers, {
+    count: TOTAL_AMOUNT_OF_USERS,
+  });
+
   const sortedAndPaginatedUsers: User[] = users
     .slice(startIndex, endIndex)
     .sort((a: User, b: User) => a.name.localeCompare(b.name));

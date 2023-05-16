@@ -14,8 +14,8 @@ export default function Task(): ReactElement {
   if (error) return <div>Failed to load</div>;
   if (!data) return <div>Loading...</div>;
 
-  const startIndex = (currentPage - 1) * TOTAL_AMOUNT_OF_USERS_PER_PAGE;
-  const endIndex = startIndex + TOTAL_AMOUNT_OF_USERS_PER_PAGE;
+  const startIndex: number = (currentPage - 1) * TOTAL_AMOUNT_OF_USERS_PER_PAGE;
+  const endIndex: number = startIndex + TOTAL_AMOUNT_OF_USERS_PER_PAGE;
   const totalPages = data.totalAmountOfPages;
 
   const handlePreviousPage = (): void => {
