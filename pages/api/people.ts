@@ -47,10 +47,9 @@ export default function handler(
   const endIndex: number = startIndex + TOTAL_AMOUNT_OF_USERS_PER_PAGE;
 
   const users: User[] = generateRandomUsers(totalAmountOfUsers);
-  const paginatedUsers: User[] = users.slice(startIndex, endIndex);
-  const sortedAndPaginatedUsers: User[] = paginatedUsers.sort(
-    (a: User, b: User) => a.name.localeCompare(b.name)
-  );
+  const sortedAndPaginatedUsers: User[] = users
+    .slice(startIndex, endIndex)
+    .sort((a: User, b: User) => a.name.localeCompare(b.name));
 
   const response: Response<User[]> = {
     data: sortedAndPaginatedUsers,
