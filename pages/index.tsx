@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 
@@ -15,7 +14,7 @@ export default function Home() {
         </h1>
       </div>
       <div className="flex place-items-center mt-12">
-      <Link href="/task">Go to task</Link>
+        <Link href="/task">Go to task</Link>
       </div>
     </main>
   );
