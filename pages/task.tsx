@@ -1,15 +1,35 @@
+import { APP_CONFIG } from "@/config";
+import User from "@/types/User";
+import { useState } from "react";
+import { useQuery } from "react-query";
+
 export default function Task() {
-  /**  TODO: Create an endpoint that returns a list of people, and use that here.
-   * Use tanstack/react-query to fetch the data
-   */
-  const people = [
-    {
-      name: "Jane Cooper",
-      email: "jane@cooper.com",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
-    },
-  ];
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const peopleQuery = useQuery({
+    queryKey: ["people", currentPage],
+    queryFn: () =>
+      fetch(`/api/people?page=${currentPage}`).then((res) => res.json()),
+  });
+
+  if (peopleQuery.isLoading) return <h1>Loading...</h1>;
+  if (peopleQuery.isError)
+    return <pre>{JSON.stringify(peopleQuery.error)}</pre>;
+
+  const people: User[] = peopleQuery.data.users || [];
+  const totalPages: number = peopleQuery.data.totalPages;
+
+  const paginateNext = () => {
+    if (currentPage !== totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  const paginateBack = () => {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mt-8 flow-root">
@@ -66,26 +86,28 @@ export default function Task() {
                 ))}
               </tbody>
             </table>
-            {/* TODO: Pagination */}
             <nav
               className="flex items-center justify-between py-3"
               aria-label="Pagination"
             >
               <div className="hidden sm:block">
                 <p className="text-sm">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">1</span> of{" "}
-                  <span className="font-medium">N</span> results
+                  Showing <span className="font-medium">{currentPage}</span> to{" "}
+                  <span className="font-medium">{totalPages}</span> of{" "}
+                  <span className="font-medium">{APP_CONFIG.TOTAL_USERS}</span>{" "}
+                  results
                 </p>
               </div>
               <div className="flex flex-1 justify-between sm:justify-end">
                 <a
+                  onClick={paginateBack}
                   href="#"
                   className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
                 >
                   Previous
                 </a>
                 <a
+                  onClick={paginateNext}
                   href="#"
                   className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
                 >
