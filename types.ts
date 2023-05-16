@@ -1,6 +1,6 @@
 export type User = {
-    name: string;
-    email: string;
-    title: string;
-    role: string;
+  readonly name: string;
+  readonly email: string;
+  readonly title: string;
+  readonly role: string;
 };
