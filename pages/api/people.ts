@@ -52,9 +52,11 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
 ) {
-  const { page } = req.query;
+  const { page = 0, recsNum = 100 } = req.query;
 
-  const people: User[][] = paginate(generateRecords(Number(100)));
+  const people: User[][] = paginate(
+    generateRecords(Number(recsNum) < 100 ? 100 : Number(recsNum))
+  );
 
   res.status(200).json(people[Number(page)]);
 }
