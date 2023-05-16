@@ -14,6 +14,15 @@ type User = {
  * The endpoint should return a pagination of 10 users per page
  * The endpoint should accept a query parameter "page" to return the corresponding page
  */
+type Response = {
+  data: User[];
+  page: number;
+  recsNum: number;
+};
+
+type ErrorResponse = {
+  error: string;
+};
 
 const generateRecords = (records: number) => {
   const people = [];
@@ -50,7 +59,7 @@ const paginate = (people: User[]) => {
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<User[]>
+  res: NextApiResponse<Response | ErrorResponse>
 ) {
   const { page = 0, recsNum = 100 } = req.query;
 
@@ -58,5 +67,11 @@ export default function handler(
     generateRecords(Number(recsNum) < 100 ? 100 : Number(recsNum))
   );
 
-  res.status(200).json(people[Number(page)]);
+  if (!people[Number(page)]) res.status(400).json({ error: "Page not found!" });
+
+  res.status(200).json({
+    data: people[Number(page)],
+    page: Number(page) + 1,
+    recsNum: Number(recsNum),
+  });
 }
