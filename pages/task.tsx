@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Response } from "@/types/Response";
 import { useState } from "react";
+import Pagination from "@/components/pagination";
 
 export default function Task() {
   /**  TODO: Create an endpoint that returns a list of people, and use that here.
@@ -59,22 +60,7 @@ export default function Task() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
-                {people.map((person) => (
-                  <tr key={person.email}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
-                      {person.name}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.title}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.email}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.role}
-                    </td>
-                  </tr>
-                ))}
+                <Pagination people={people} />
               </tbody>
             </table>
             {/* TODO: Pagination */}
