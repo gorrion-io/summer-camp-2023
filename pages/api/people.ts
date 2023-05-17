@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { faker } from "@faker-js/faker";
 
 type User = {
   name: string;
@@ -7,16 +8,37 @@ type User = {
   role: string;
 };
 
-/**
- * TODO: Prepare an endpoint to return a list of users
- * User faker.js or similar library to generate fake data, the minimal number of users is 100
- * The endpoint should return a pagination of 10 users per page
- * The endpoint should accept a query parameter "page" to return the corresponding page
- */
+const generateUsers = (numUsers: number): User[] => {
+  const users: User[] = [];
+  for (let i = 0; i < numUsers; i++) {
+    const user: User = {
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      title: faker.person.jobTitle(),
+      role: faker.person.jobType(),
+    };
+    users.push(user);
+  }
+  users.sort((a, b) => a.name.localeCompare(b.name));
+  return users;
+};
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<User[]>
+  res: NextApiResponse<{ users: User[]; totalResults: number }>
 ) {
-  res.status(200).json([]);
+  const numUsers: number =
+    Number(req.query.numUsers) < 100 ? 100 : Number(req.query.numUsers) || 100;
+  const page: number = Number(req.query.page) || 1;
+  const perPage: number = 10;
+
+  const users: User[] = generateUsers(numUsers);
+
+  const startIndex: number = (page - 1) * perPage;
+  const endIndex: number = startIndex + perPage;
+
+  const usersForPage: User[] = users.slice(startIndex, endIndex);
+  const totalResults: number = users.length;
+
+  res.status(200).json({ users: usersForPage, totalResults });
 }
