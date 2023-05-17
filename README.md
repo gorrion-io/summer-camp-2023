@@ -17,9 +17,13 @@ pnpm dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Tasks
-1. Create an endpoint in `api/people.ts` that returns a list of people. The list should be sorted by `name` in ascending order.
-The data should be paginated and return 10 people per page. The endpoint should accept a parameter `page` that specifies the page number to return. The user data should be generated using faker.js or similar library. The minimum number of user is 100. It should be parametrized so that we can specify the number of users to generate.
+
+1. Create an endpoint in `api/people.ts` that returns a list of people. The list should be sorted by `name` in ascending order.The data should be paginated and return 10 people per page. The endpoint should accept a parameter `page` that specifies the page number to return. The user data should be generated using faker.js or similar library. The minimum number of user is 100.It should be parametrized so that we can specify the number of users to generate.
 
 2. Use `tanstack/react-query` or `swr` to fetch data in `pages/task.tsx`.
 
-3. Prepare the pagination component to be used in `pages/task.tsx`. 
+3. Prepare the pagination component to be used in `pages/task.tsx`.
+
+## Solution
+
+I completed the task according to the requirements and used the mentioned technologies for it. Additionally, I adapted the website for responsive web design (RWD) and added a loader that activates when data is being fetched.
