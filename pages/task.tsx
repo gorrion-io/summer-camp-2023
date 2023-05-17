@@ -1,15 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
+import { Response } from "@/types/Response";
+import { useState } from "react";
+
 export default function Task() {
   /**  TODO: Create an endpoint that returns a list of people, and use that here.
    * Use tanstack/react-query to fetch the data
    */
-  const people = [
-    {
-      name: "Jane Cooper",
-      email: "jane@cooper.com",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
-    },
-  ];
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const peopleQuery = useQuery({
+    queryKey: ["people", currentPage],
+    queryFn: (): Promise<Response> =>
+      fetch(`/api/people?page=${currentPage}`).then((res) => res.json()),
+  });
+
+  if (peopleQuery.isLoading) return <div>Loading...</div>;
+
+  const maxPage = Math.ceil(peopleQuery.data!.recsNum / 10);
+  const people = peopleQuery.data!.data;
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mt-8 flow-root">
@@ -73,24 +82,40 @@ export default function Task() {
             >
               <div className="hidden sm:block">
                 <p className="text-sm">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">1</span> of{" "}
-                  <span className="font-medium">N</span> results
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * 10 + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * 10 + peopleQuery.data!.data.length!}
+                  </span>{" "}
+                  of{" "}
+                  <span className="font-medium">
+                    {peopleQuery.data!.recsNum}
+                  </span>{" "}
+                  results
                 </p>
               </div>
               <div className="flex flex-1 justify-between sm:justify-end">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                >
-                  Next
-                </a>
+                {currentPage != 1 && (
+                  <a
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    href="#"
+                    className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  >
+                    Previous
+                  </a>
+                )}
+                {currentPage != maxPage && (
+                  <a
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    href="#"
+                    className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  >
+                    Next
+                  </a>
+                )}
               </div>
             </nav>
           </div>
