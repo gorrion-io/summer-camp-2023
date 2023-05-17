@@ -12,6 +12,8 @@ import { User, Response, ErrorResponse } from "@/types/Response";
 const generateRecords = (records: number) => {
   const people = [];
 
+  faker.seed(100);
+
   for (let i = 0; i < Number(records); i++) {
     let firstName = faker.person.firstName();
     let lastName = faker.person.lastName();
