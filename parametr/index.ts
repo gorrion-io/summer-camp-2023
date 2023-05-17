@@ -1,1 +1,1 @@
-export const numberOfUsers = 200;
+export const numberOfUsers = 300;

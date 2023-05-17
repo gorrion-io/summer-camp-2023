@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { faker } from '@faker-js/faker';
 import { numberOfUsers } from '../../parametr';
 
-type User = {
+export type User = {
   name: string;
   email: string;
   title: string;
