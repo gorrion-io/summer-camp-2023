@@ -46,17 +46,18 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response | ErrorResponse>
 ) {
-  const { page = 0, recsNum = 100 } = req.query;
+  const { page = 1, recsNum = 100 } = req.query;
 
   const people: User[][] = paginate(
     generateRecords(Number(recsNum) < 100 ? 100 : Number(recsNum))
   );
 
-  if (!people[Number(page)]) res.status(400).json({ error: "Page not found!" });
+  if (!people[Number(page) - 1])
+    res.status(400).json({ error: "Page not found!" });
 
   res.status(200).json({
-    data: people[Number(page)],
-    page: Number(page) + 1,
+    data: people[Number(page) - 1],
+    page: Number(page),
     recsNum: Number(recsNum),
   });
 }
