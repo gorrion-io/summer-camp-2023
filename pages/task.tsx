@@ -8,16 +8,18 @@ export default function Task() {
    */
   const [currentPage, setCurrentPage] = useState(1);
 
-  const peopleQuery = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["people", currentPage],
     queryFn: (): Promise<Response> =>
-      fetch(`/api/people?page=${currentPage}`).then((res) => res.json()),
+      fetch(`/api/people?page=${currentPage}`)
+        .then((res) => res.json())
+        .catch((err) => err),
   });
 
-  if (peopleQuery.isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading...</div>;
 
-  const maxPage = Math.ceil(peopleQuery.data!.recsNum / 10);
-  const people = peopleQuery.data!.data;
+  const maxPage = Math.ceil(data!.recsNum / 10);
+  const people = data!.data;
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -88,12 +90,9 @@ export default function Task() {
                   </span>{" "}
                   to{" "}
                   <span className="font-medium">
-                    {(currentPage - 1) * 10 + peopleQuery.data!.data.length!}
+                    {(currentPage - 1) * 10 + data!.data.length!}
                   </span>{" "}
-                  of{" "}
-                  <span className="font-medium">
-                    {peopleQuery.data!.recsNum}
-                  </span>{" "}
+                  of <span className="font-medium">{data!.recsNum}</span>{" "}
                   results
                 </p>
               </div>
