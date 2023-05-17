@@ -1,12 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { faker } from "@faker-js/faker";
-
-type User = {
-  name: string;
-  email: string;
-  title: string;
-  role: string;
-};
+import { User, Response, ErrorResponse } from "@/types/Response";
 
 /**
  * TODO: Prepare an endpoint to return a list of users
@@ -14,15 +8,6 @@ type User = {
  * The endpoint should return a pagination of 10 users per page
  * The endpoint should accept a query parameter "page" to return the corresponding page
  */
-type Response = {
-  data: User[];
-  page: number;
-  recsNum: number;
-};
-
-type ErrorResponse = {
-  error: string;
-};
 
 const generateRecords = (records: number) => {
   const people = [];
