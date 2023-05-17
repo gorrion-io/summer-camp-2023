@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { faker } from "@faker-js/faker";
-import { list } from "postcss";
 
 type User = {
   name: string;
@@ -15,6 +14,12 @@ type User = {
  * The endpoint should return a pagination of 10 users per page
  * The endpoint should accept a query parameter "page" to return the corresponding page
  */
+
+// TODO: delete before contributing
+// funciton: generate min 100 users
+// create new list of users
+// use faker.js to generate data
+// sort created list and return it
 
 const generateUsers = (count: number): User[] => {
   const userList: User[] = [];
