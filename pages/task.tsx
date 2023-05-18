@@ -1,15 +1,27 @@
+import { useQuery } from "@tanstack/react-query";
+import { Response } from "@/types/Response";
+import { useState } from "react";
+import Pagination from "@/components/pagination";
+
 export default function Task() {
-  /**  TODO: Create an endpoint that returns a list of people, and use that here.
-   * Use tanstack/react-query to fetch the data
-   */
-  const people = [
-    {
-      name: "Jane Cooper",
-      email: "jane@cooper.com",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["people", currentPage],
+    queryFn: async (): Promise<Response> => {
+      const res = await fetch(`/api/people?page=${currentPage}`);
+      if (!res.ok) throw new Error("Something went wrong!");
+
+      return res.json();
     },
-  ];
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>{`${error}`}</div>;
+
+  const maxPage = Math.ceil(data!.recsNum / 10);
+  const people = data!.data;
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mt-8 flow-root">
@@ -48,49 +60,46 @@ export default function Task() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
-                {people.map((person) => (
-                  <tr key={person.email}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
-                      {person.name}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.title}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.email}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.role}
-                    </td>
-                  </tr>
-                ))}
+                <Pagination people={people} />
               </tbody>
             </table>
-            {/* TODO: Pagination */}
             <nav
               className="flex items-center justify-between py-3"
               aria-label="Pagination"
             >
               <div className="hidden sm:block">
                 <p className="text-sm">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">1</span> of{" "}
-                  <span className="font-medium">N</span> results
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * 10 + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * 10 + data!.data.length!}
+                  </span>{" "}
+                  of <span className="font-medium">{data!.recsNum}</span>{" "}
+                  results
                 </p>
               </div>
               <div className="flex flex-1 justify-between sm:justify-end">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                >
-                  Next
-                </a>
+                {currentPage != 1 && (
+                  <a
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    href="#"
+                    className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  >
+                    Previous
+                  </a>
+                )}
+                {currentPage != maxPage && (
+                  <a
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    href="#"
+                    className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  >
+                    Next
+                  </a>
+                )}
               </div>
             </nav>
           </div>
