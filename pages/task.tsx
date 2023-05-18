@@ -7,17 +7,20 @@ export default function Task() {
   /**  TODO: Create an endpoint that returns a list of people, and use that here.
    * Use tanstack/react-query to fetch the data
    */
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(100);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["people", currentPage],
-    queryFn: (): Promise<Response> =>
-      fetch(`/api/people?page=${currentPage}`)
-        .then((res) => res.json())
-        .catch((err) => err),
+    queryFn: async (): Promise<Response> => {
+      const res = await fetch(`/api/people?page=${currentPage}`);
+      if (!res.ok) throw new Error("Something went wrong!");
+
+      return res.json();
+    },
   });
 
   if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>{`${error}`}</div>;
 
   const maxPage = Math.ceil(data!.recsNum / 10);
   const people = data!.data;
