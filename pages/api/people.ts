@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type User = {
@@ -6,6 +7,19 @@ type User = {
   title: string;
   role: string;
 };
+
+const TOTAL_USERS = 100;
+
+function generateUserData(): User {
+  return {
+    name: faker.person.fullName(),
+    email: faker.internet.email(),
+    title: faker.person.jobArea(),
+    role: faker.person.jobType(),
+  };
+}
+
+const userList = faker.helpers.multiple(generateUserData, { count: TOTAL_USERS });
 
 /**
  * TODO: Prepare an endpoint to return a list of users
@@ -18,5 +32,5 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
 ) {
-  res.status(200).json([]);
+  res.status(200).json(userList);
 }
