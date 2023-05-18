@@ -47,14 +47,9 @@ export default function handler(
     count: TOTAL_AMOUNT_OF_USERS,
   });
 
-  const sortedUsers: User[] = users.sort((a: User, b: User) =>
-    a.name.localeCompare(b.name)
-  );
-
-  const sortedAndPaginatedUsers: User[] = sortedUsers.slice(
-    startIndex,
-    endIndex
-  );
+  const sortedAndPaginatedUsers: User[] = users
+    .sort((a: User, b: User) => a.name.localeCompare(b.name))
+    .slice(startIndex, endIndex);
 
   const response: Response<User[]> = {
     data: sortedAndPaginatedUsers,
