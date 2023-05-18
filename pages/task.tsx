@@ -4,10 +4,7 @@ import { useState } from "react";
 import Pagination from "@/components/pagination";
 
 export default function Task() {
-  /**  TODO: Create an endpoint that returns a list of people, and use that here.
-   * Use tanstack/react-query to fetch the data
-   */
-  const [currentPage, setCurrentPage] = useState(100);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["people", currentPage],
@@ -66,7 +63,6 @@ export default function Task() {
                 <Pagination people={people} />
               </tbody>
             </table>
-            {/* TODO: Pagination */}
             <nav
               className="flex items-center justify-between py-3"
               aria-label="Pagination"
