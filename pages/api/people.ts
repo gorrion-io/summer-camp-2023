@@ -31,10 +31,12 @@ export default function handler(
   const { page = "1" } = req.query;
   const currentPage = Number(page);
 
-  const paginationStartIndex = currentPage * USERS_PER_PAGE;
+  const paginationStartIndex = (currentPage - 1) * USERS_PER_PAGE;
   const paginationEndIndex = paginationStartIndex + USERS_PER_PAGE;
 
-  const pagination = userList.slice(paginationStartIndex, paginationEndIndex);
+  const pagination = userList
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .slice(paginationStartIndex, paginationEndIndex);
 
   res.status(200).json(pagination);
 }
