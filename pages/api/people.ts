@@ -9,6 +9,7 @@ type User = {
 };
 
 const TOTAL_USERS = 100;
+const USERS_PER_PAGE = 10;
 
 function generateUserData(): User {
   return {
@@ -19,18 +20,21 @@ function generateUserData(): User {
   };
 }
 
-const userList = faker.helpers.multiple(generateUserData, { count: TOTAL_USERS });
-
-/**
- * TODO: Prepare an endpoint to return a list of users
- * User faker.js or similar library to generate fake data, the minimal number of users is 100
- * The endpoint should return a pagination of 10 users per page
- * The endpoint should accept a query parameter "page" to return the corresponding page
- */
+const userList = faker.helpers.multiple(generateUserData, {
+  count: TOTAL_USERS,
+});
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
 ) {
-  res.status(200).json(userList);
+  const { page = "1" } = req.query;
+  const currentPage = Number(page);
+
+  const paginationStartIndex = currentPage * USERS_PER_PAGE;
+  const paginationEndIndex = paginationStartIndex + USERS_PER_PAGE;
+
+  const pagination = userList.slice(paginationStartIndex, paginationEndIndex);
+
+  res.status(200).json(pagination);
 }
