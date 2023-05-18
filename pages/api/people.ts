@@ -1,4 +1,5 @@
-import faker from "faker";
+import {useEffect, useState} from 'react';
+import { faker } from "@faker-js/faker";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type User = {
@@ -17,7 +18,7 @@ type User = {
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<User[]>
+  res: NextApiResponse
 ) {
   const page = Number(req.query.page) || 1;
   const perPage = 10;
@@ -36,5 +37,6 @@ export default function handler(
   const endIndex = startIndex + perPage;
 
   const paginatedPeople = people.slice(startIndex, endIndex);
-  res.status(200).json(paginatedPeople);
+  const totalPages = Math.ceil(totalPeople/perPage);
+  res.status(200).json({paginatedPeople, totalPeople, totalPages, startIndex, endIndex});
 }
