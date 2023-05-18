@@ -8,6 +8,7 @@ import {
 
 type Response<T> = {
   readonly data: T;
+  readonly currentPage: number;
   readonly totalAmountOfPages: number;
 };
 
@@ -52,6 +53,7 @@ export default function handler(
 
   const response: Response<User[]> = {
     data: sortedAndPaginatedUsers,
+    currentPage,
     totalAmountOfPages,
   };
 
