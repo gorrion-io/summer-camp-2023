@@ -16,7 +16,7 @@ function generateUserData(): User {
   return {
     name: faker.person.fullName(),
     email: faker.internet.email(),
-    title: faker.person.jobArea(),
+    title: faker.person.jobTitle(),
     role: faker.person.jobType(),
   };
 }
