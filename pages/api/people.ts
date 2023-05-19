@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Response } from "../types";
 
 type User = {
   name: string;
@@ -26,7 +27,7 @@ const userList = faker.helpers.multiple(generateUserData, {
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<User[]>
+  res: NextApiResponse<Response>
 ) {
   const { page = "1" } = req.query;
   const currentPage = Number(page);
@@ -38,5 +39,11 @@ export default function handler(
     .sort((a, b) => a.name.localeCompare(b.name))
     .slice(paginationStartIndex, paginationEndIndex);
 
-  res.status(200).json(pagination);
+  const response = {
+    pagination,
+    paginationStartIndex,
+    TOTAL_USERS,
+  };
+
+  res.status(200).json(response);
 }
