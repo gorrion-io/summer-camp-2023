@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { User, userCount } from "./api/people";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { User } from "@/types";
+import { userCount } from "@/constants";
 
 const fetchUsers = async (page: number) => {
   const res = await fetch(`./api/people?page=${page}`);
@@ -102,7 +103,6 @@ export default function Task() {
                 ))}
               </tbody>
             </table>
-            {/* TODO: Pagination */}
             <nav
               className="flex items-center justify-between py-3"
               aria-label="Pagination"
