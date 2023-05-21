@@ -3,19 +3,6 @@ import { faker } from "@faker-js/faker";
 import { User, Response } from "@/types";
 import { userCount } from "@/constants";
 
-/**
- * TODO: Prepare an endpoint to return a list of users
- * User faker.js or similar library to generate fake data, the minimal number of users is 100
- * The endpoint should return a pagination of 10 users per page
- * The endpoint should accept a query parameter "page" to return the corresponding page
- */
-
-// TODO: delete before contributing
-// funciton: generate min 100 users
-// create new list of users
-// use faker.js to generate data
-// sort created list and return it
-
 const generateUsers = (count: number): User[] => {
   const userList: User[] = [];
 
