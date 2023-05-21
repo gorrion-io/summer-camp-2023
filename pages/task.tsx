@@ -1,15 +1,31 @@
+import { useQuery } from "@tanstack/react-query";
+import { User } from "./api/people";
+import { useState } from "react";
+
+const fetchUsers = async (page: number) => {
+  const res = await fetch(`./api/people?page=${page}`);
+  if (!res.ok) {
+    throw new Error("Something went wrong...");
+  }
+  const data = await res.json();
+  return data;
+};
+
 export default function Task() {
-  /**  TODO: Create an endpoint that returns a list of people, and use that here.
-   * Use tanstack/react-query to fetch the data
-   */
-  const people = [
-    {
-      name: "Jane Cooper",
-      email: "jane@cooper.com",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
-    },
-  ];
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const userQuery = useQuery({
+    queryKey: ["users", currentPage],
+    queryFn: () => fetchUsers(currentPage),
+  });
+
+  if (userQuery.isLoading) return <div className="flex justify-center items-center">Loading...</div>;
+  
+  
+  if (userQuery.isError) return <div className="flex justify-center items-center">Something went wrong...</div>;
+  
+const users: User[] = userQuery.data.users || [];
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mt-8 flow-root">
@@ -48,19 +64,19 @@ export default function Task() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
-                {people.map((person) => (
-                  <tr key={person.email}>
+                {users.map((user) => (
+                  <tr key={user.email}>
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
-                      {person.name}
+                      {user.name}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.title}
+                      {user.title}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.email}
+                      {user.email}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-                      {person.role}
+                      {user.role}
                     </td>
                   </tr>
                 ))}
