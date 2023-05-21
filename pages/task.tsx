@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { User } from "./api/people";
+import { User, userCount } from "./api/people";
 import { useState } from "react";
 
 const fetchUsers = async (page: number) => {
@@ -14,17 +14,37 @@ const fetchUsers = async (page: number) => {
 export default function Task() {
   const [currentPage, setCurrentPage] = useState(1);
 
+  const pageFirstIndex = (currentPage - 1) * 10 + 1;
+  const pageLastIndex = currentPage * 10;
+
   const userQuery = useQuery({
     queryKey: ["users", currentPage],
     queryFn: () => fetchUsers(currentPage),
   });
 
-  if (userQuery.isLoading) return <div className="flex justify-center items-center">Loading...</div>;
-  
-  
-  if (userQuery.isError) return <div className="flex justify-center items-center">Something went wrong...</div>;
-  
-const users: User[] = userQuery.data.users || [];
+  if (userQuery.isLoading)
+    return <div className="flex justify-center items-center">Loading...</div>;
+
+  if (userQuery.isError)
+    return (
+      <div className="flex justify-center items-center">
+        Something went wrong...
+      </div>
+    );
+
+  const users: User[] = userQuery.data.users || [];
+  const totalPages: number = userQuery.data.numOfPages;
+
+  const goToNextPage = () => {
+    if (currentPage !== totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  const goToPreviousPage = () => {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -89,21 +109,26 @@ const users: User[] = userQuery.data.users || [];
             >
               <div className="hidden sm:block">
                 <p className="text-sm">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">1</span> of{" "}
-                  <span className="font-medium">N</span> results
+                  Showing <span className="font-medium">{pageFirstIndex}</span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {pageLastIndex > userCount ? userCount : pageLastIndex}
+                  </span>{" "}
+                  of <span className="font-medium">{userCount}</span> results
                 </p>
               </div>
               <div className="flex flex-1 justify-between sm:justify-end">
                 <a
                   href="#"
                   className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  onClick={goToPreviousPage}
                 >
                   Previous
                 </a>
                 <a
                   href="#"
                   className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+                  onClick={goToNextPage}
                 >
                   Next
                 </a>
