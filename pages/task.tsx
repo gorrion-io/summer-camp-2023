@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import User from "@/types/User";
+import { maxAmmountOfUsers, usersPerPage, totalPages } from "@/constants/main";
 
 const getUsers = async (pageNumber: number) => {
 	const response = await fetch(`./api/people?page=${pageNumber}`);
-	if (!response.ok) throw new Error("Error with fetching data");
+	if (!response.ok)
+		throw new Error("Error connecting to database, please try again later.");
 
 	const data = await response.json();
 	return data;
@@ -12,6 +14,7 @@ const getUsers = async (pageNumber: number) => {
 
 export default function Task() {
 	const [pageNumber, setPageNumber] = useState(1);
+	const queryClient = useQueryClient();
 
 	const {
 		isLoading,
@@ -22,25 +25,60 @@ export default function Task() {
 		queryFn: () => getUsers(pageNumber),
 	});
 
-	if (isLoading) return "loading";
-	if (error) return "error";
+	const firstIndex = (pageNumber - 1) * usersPerPage;
+	const lastIndex = firstIndex + usersPerPage;
 
-	const usersList = users.map((user: User) => (
-		<tr key={user.email}>
-			<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
-				{user.name}
-			</td>
-			<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-				{user.title}
-			</td>
-			<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-				{user.email}
-			</td>
-			<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
-				{user.role}
-			</td>
-		</tr>
-	));
+	const prevPageClickHanlder = () => {
+		setPageNumber(prevPageNumber => {
+			if (prevPageNumber === 1) return prevPageNumber;
+			return prevPageNumber - 1;
+		});
+	};
+
+	const nextPageClickHanlder = () => {
+		setPageNumber(prevPageNumber => {
+			if (prevPageNumber === totalPages) return prevPageNumber;
+			return prevPageNumber + 1;
+		});
+	};
+
+	let usersList,
+		emptyList = [];
+
+	if (isLoading) {
+		for (let i = 0; i < usersPerPage; i++) {
+			emptyList.push(
+				<tr key={i}>
+					<td className="whitespace-nowrap py-6 pl-4 pr-3 text-sm font-medium text-white sm:pl-0"></td>
+					<td className="whitespace-nowrap px-3 py-6 text-sm text-gray-300"></td>
+					<td className="whitespace-nowrap px-3 py-6 text-sm text-gray-300"></td>
+					<td className="whitespace-nowrap px-3 py-6 text-sm text-gray-300"></td>
+				</tr>
+			);
+		}
+	}
+
+	if (error)
+		return <p>Error connecting to database, please try again later.</p>;
+
+	if (users) {
+		usersList = users.map((user: User) => (
+			<tr key={user.email}>
+				<td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-0">
+					{user.name}
+				</td>
+				<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+					{user.title}
+				</td>
+				<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+					{user.email}
+				</td>
+				<td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300">
+					{user.role}
+				</td>
+			</tr>
+		));
+	}
 
 	return (
 		<div className="mx-auto max-w-7xl">
@@ -79,30 +117,34 @@ export default function Task() {
 									</th>
 								</tr>
 							</thead>
-							<tbody className="divide-y divide-gray-800">{usersList}</tbody>
+							<tbody className="divide-y divide-gray-800">
+								{isLoading ? emptyList : usersList}
+							</tbody>
 						</table>
-						{/* TODO: Pagination */}
 						<nav
 							className="flex items-center justify-between py-3"
 							aria-label="Pagination"
 						>
 							<div className="hidden sm:block">
 								<p className="text-sm">
-									Showing <span className="font-medium">1</span> to{" "}
-									<span className="font-medium">1</span> of{" "}
-									<span className="font-medium">N</span> results
+									Showing <span className="font-medium">{firstIndex + 1}</span>{" "}
+									to <span className="font-medium">{lastIndex}</span> of{" "}
+									<span className="font-medium">{maxAmmountOfUsers}</span>{" "}
+									results
 								</p>
 							</div>
 							<div className="flex flex-1 justify-between sm:justify-end">
 								<a
 									href="#"
 									className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+									onClick={prevPageClickHanlder}
 								>
 									Previous
 								</a>
 								<a
 									href="#"
 									className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+									onClick={nextPageClickHanlder}
 								>
 									Next
 								</a>

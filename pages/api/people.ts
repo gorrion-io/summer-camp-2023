@@ -20,6 +20,8 @@ const generateUsers = (numberOfUsers: number): User[] => {
 	return users;
 };
 
+const allUsers: User[] = generateUsers(maxAmmountOfUsers);
+
 export default function handler(
 	req: NextApiRequest,
 	res: NextApiResponse<User[] | ErrorMessage>
@@ -35,9 +37,9 @@ export default function handler(
 	const firstIndex = (pageNumber - 1) * usersPerPage;
 	const lastIndex = firstIndex + usersPerPage;
 
-	const users = generateUsers(maxAmmountOfUsers)
-		.slice(firstIndex, lastIndex)
-		.sort((a, b) => a.name.localeCompare(b.name));
+	const users = allUsers
+		.sort((a, b) => a.name.localeCompare(b.name))
+		.slice(firstIndex, lastIndex);
 
 	res.status(200).json(users);
 }
