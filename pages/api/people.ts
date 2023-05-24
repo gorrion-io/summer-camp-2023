@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { faker } from "@faker-js/faker";
 import User from "@/types/User";
 import ErrorMessage from "@/types/ErrorMessage";
+import { maxAmmountOfUsers, usersPerPage, totalPages } from "@/constants/main";
 
 const generateUsers = (numberOfUsers: number): User[] => {
 	const users: User[] = [];
@@ -18,10 +19,6 @@ const generateUsers = (numberOfUsers: number): User[] => {
 
 	return users;
 };
-
-const maxAmmountOfUsers = 120;
-const usersPerPage = 10;
-const totalPages = Math.ceil(maxAmmountOfUsers / usersPerPage);
 
 export default function handler(
 	req: NextApiRequest,
