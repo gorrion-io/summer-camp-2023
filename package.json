@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-people": "ts-node dev-data/generate-people.ts $PEOPLE"
   },
   "dependencies": {
     "@types/node": "20.1.4",

@@ -3,14 +3,10 @@ const {faker} = require('@faker-js/faker');
 
 const FILE_PATH = 'dev-data/people.json';
 
-// Determine the amount of data to generate from execution parameters
-// First number is the amount of records to be generated
+// Determine the amount of data to generate from npm script execution parameters
 // If user doesn't specify the number (or the number he passed is too small), 100 objects will be generated.
-let recordsToGenerate = 0;
-for (const arg in process.argv) {
-    recordsToGenerate = Number.parseInt(arg) || 0;
-    if (recordsToGenerate) break;
-}
+let userInput = process.env.npm_config_people || '100';
+let recordsToGenerate = Number.parseInt(userInput);
 recordsToGenerate = recordsToGenerate >= 100 ? recordsToGenerate : 100;
 
 // Generate data and save to file at once
