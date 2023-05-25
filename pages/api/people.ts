@@ -1,10 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type {NextApiRequest, NextApiResponse} from 'next';
+import fs from 'fs';
 
 type User = {
-  name: string;
-  email: string;
-  title: string;
-  role: string;
+    name: string;
+    email: string;
+    title: string;
+    role: string;
 };
 
 /**
@@ -14,9 +15,55 @@ type User = {
  * The endpoint should accept a query parameter "page" to return the corresponding page
  */
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<User[]>
-) {
-  res.status(200).json([]);
+const FILE_PATH = 'dev-data/people.json';
+const RESULTS_PER_PAGE = 10;
+
+// Import sample data from file
+let users: User[];
+try {
+    users = JSON.parse(fs.readFileSync(FILE_PATH, 'utf-8'));
+} catch {
+    console.log('File containing sample user data not found');
+    users = [];
+}
+
+class AppError extends Error {
+    statusCode: number;
+    constructor(message: string, statusCode: number) {
+        super(message);
+        this.statusCode = statusCode;
+    }
+}
+
+// Sort the users by name (ascending order)
+users.sort((userA, userB) => {
+    if (userA.name > userB.name) return 1;
+    return -1;
+});
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        // Return error if there is no data.
+        if (users.length == 0) throw new AppError('User data not found', 500);
+
+        // If user does not specify page parameter, the first page will be selected
+        // Errors are thrown when the page passed by the user cannot be processed correctly
+        const page = Number.parseInt(String(req.query.page)) || 1;
+        if (page < 1) {
+            throw new AppError('Page must be a natural number', 400);
+        }
+        const toSkip = (page - 1) * RESULTS_PER_PAGE;
+        if (toSkip > users.length) {
+            throw new AppError('This page does not exist', 404);
+        }
+
+        const result = users.slice(toSkip, toSkip + RESULTS_PER_PAGE);
+        res.status(200).json(result);
+    } catch (err: any) {
+        console.log(err.message);
+        res.status(err.statusCode).json({
+            status: 'fail',
+            message: err.message,
+        });
+    }
 }
