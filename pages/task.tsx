@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import useSWR from 'swr';
 
 const fetcher = async (url: string) => {
@@ -16,22 +17,37 @@ export default function Task() {
      * Use tanstack/react-query to fetch the data
      */
 
-    let page = 10;
-    const {data, error, isLoading} = useSWR(
-        `/api/people?page=${page}`,
-        fetcher
-    );
+    const [page, setPage] = useState(1);
+    const resultsPerPage = 10;
 
-    if (isLoading) {
-        return <h1>Loading</h1>;
-    }
+    const {data, isLoading, error} = useSWR(`api/people?page=${page}`, fetcher);
+
+    const [firstElIndex, setFirstElIndex] = useState(1);
+    const [lastElIndex, setLastElIndex] = useState(resultsPerPage);
+
+    const total = 128; // HARDCODED, FIX IN FUTURE
+    const maxPage = Math.ceil(total / 10);
+
+    const people: User[] = data;
+
     if (error) {
         return <h1>{error.message}</h1>;
     }
+    if (isLoading) {
+        return <h1>Loading...</h1>;
+    }
 
-    const people: User[] = data;
-    if (people.length === 0) {
-        return <h1>People list is empty</h1>;
+    function handlePagination(pageDelta: number) {
+        if (page == 1 && pageDelta < 0) return () => {};
+        if (page + pageDelta > maxPage) return () => {};
+
+        return () => {
+            setPage(page + pageDelta);
+            setFirstElIndex(firstElIndex + resultsPerPage * pageDelta);
+            if (lastElIndex + resultsPerPage * pageDelta > total)
+                setLastElIndex(total);
+            else setLastElIndex(lastElIndex + resultsPerPage * pageDelta);
+        };
     }
 
     return (
@@ -101,20 +117,28 @@ export default function Task() {
                             <div className="hidden sm:block">
                                 <p className="text-sm">
                                     Showing{' '}
-                                    <span className="font-medium">1</span> to{' '}
-                                    <span className="font-medium">1</span> of{' '}
-                                    <span className="font-medium">N</span>{' '}
+                                    <span className="font-medium">
+                                        {firstElIndex}
+                                    </span>{' '}
+                                    to{' '}
+                                    <span className="font-medium">
+                                        {lastElIndex}
+                                    </span>{' '}
+                                    of{' '}
+                                    <span className="font-medium">{total}</span>{' '}
                                     results
                                 </p>
                             </div>
                             <div className="flex flex-1 justify-between sm:justify-end">
                                 <a
+                                    onClick={handlePagination(-1)}
                                     href="#"
                                     className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
                                 >
                                     Previous
                                 </a>
                                 <a
+                                    onClick={handlePagination(1)}
                                     href="#"
                                     className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
                                 >
