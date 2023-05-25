@@ -43,9 +43,6 @@ users.sort((userA, userB) => {
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
-        // Return error if there is no data.
-        if (users.length == 0) throw new AppError('User data not found', 500);
-
         // If user does not specify page parameter, the first page will be selected
         // Errors are thrown when the page passed by the user cannot be processed correctly
         const page = Number.parseInt(String(req.query.page)) || 1;
