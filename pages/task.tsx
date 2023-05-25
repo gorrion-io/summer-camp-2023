@@ -17,18 +17,12 @@ export default function Task() {
      * Use tanstack/react-query to fetch the data
      */
 
-    const [page, setPage] = useState(1);
     const resultsPerPage = 10;
+    const [page, setPage] = useState(1);
 
     const {data, isLoading, error} = useSWR(`api/people?page=${page}`, fetcher);
-
-    const [firstElIndex, setFirstElIndex] = useState(1);
-    const [lastElIndex, setLastElIndex] = useState(resultsPerPage);
-
-    const total = 128; // HARDCODED, FIX IN FUTURE
-    const maxPage = Math.ceil(total / 10);
-
-    const people: User[] = data;
+    let [firstElIndex, setFirstElIndex] = useState(1);
+    let [lastElIndex, setLastElIndex] = useState(resultsPerPage);
 
     if (error) {
         return <h1>{error.message}</h1>;
@@ -37,6 +31,10 @@ export default function Task() {
         return <h1>Loading...</h1>;
     }
 
+    const people: User[] = data.people;
+    const total = data.totalNumber;
+    const maxPage = Math.ceil(total / resultsPerPage);
+
     function handlePagination(pageDelta: number) {
         if (page == 1 && pageDelta < 0) return () => {};
         if (page + pageDelta > maxPage) return () => {};
@@ -44,9 +42,16 @@ export default function Task() {
         return () => {
             setPage(page + pageDelta);
             setFirstElIndex(firstElIndex + resultsPerPage * pageDelta);
-            if (lastElIndex + resultsPerPage * pageDelta > total)
-                setLastElIndex(total);
-            else setLastElIndex(lastElIndex + resultsPerPage * pageDelta);
+
+            let nextLastIndex = lastElIndex;
+            if (lastElIndex % resultsPerPage !== 0) {
+                nextLastIndex += people.length * pageDelta; // substract/add the visible number of objects on the page if not on full page
+            } else {
+                nextLastIndex += resultsPerPage * pageDelta; // subtract/add the specified number if on full page
+            }
+            if (nextLastIndex > total) nextLastIndex = total;
+
+            setLastElIndex(nextLastIndex);
         };
     }
 

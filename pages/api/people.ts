@@ -55,7 +55,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         }
 
         const result = users.slice(toSkip, toSkip + RESULTS_PER_PAGE);
-        res.status(200).json(result);
+        res.status(200).json({
+            people: result,
+            totalNumber: users.length,
+            firstElementIndex: toSkip + 1,
+            lastElementIndex: toSkip + result.length
+        });
     } catch (err: any) {
         console.log(err.message);
         res.status(err.statusCode).json({
