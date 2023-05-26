@@ -13,10 +13,6 @@ const fetcher = async (url: string) => {
 };
 
 export default function Task() {
-    /**  TODO: Create an endpoint that returns a list of people, and use that here.
-     * Use tanstack/react-query to fetch the data
-     */
-
     const resultsPerPage = 10;
     const [page, setPage] = useState(1);
 
@@ -114,7 +110,6 @@ export default function Task() {
                                 ))}
                             </tbody>
                         </table>
-                        {/* TODO: Pagination */}
                         <nav
                             className="flex items-center justify-between py-3"
                             aria-label="Pagination"
