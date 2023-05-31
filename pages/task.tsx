@@ -1,15 +1,32 @@
+import { useState } from "react";
+import useSWR from "swr";
+import { User } from "@/helpers/types";
+import Pagination from "@/components/pagination";
+
+async function fetcher<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
+  return fetch(input, init).then((res) => res.json());
+}
+
 export default function Task() {
-  /**  TODO: Create an endpoint that returns a list of people, and use that here.
-   * Use tanstack/react-query to fetch the data
-   */
-  const people = [
-    {
-      name: "Jane Cooper",
-      email: "jane@cooper.com",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
-    },
-  ];
+  const [pageIndex, setPageIndex] = useState(1);
+  const {
+    data: people,
+    isLoading,
+    error,
+  } = useSWR<User[]>(`/api/people/${pageIndex}`, fetcher);
+
+  if (isLoading) {
+    return <></>;
+  }
+
+  if (error || people === undefined) {
+    return (
+      <div className="flex justify-center text-4xl">
+        Failed to fetch people.
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-7xl">
       <div className="mt-8 flow-root">
@@ -66,33 +83,7 @@ export default function Task() {
                 ))}
               </tbody>
             </table>
-            {/* TODO: Pagination */}
-            <nav
-              className="flex items-center justify-between py-3"
-              aria-label="Pagination"
-            >
-              <div className="hidden sm:block">
-                <p className="text-sm">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">1</span> of{" "}
-                  <span className="font-medium">N</span> results
-                </p>
-              </div>
-              <div className="flex flex-1 justify-between sm:justify-end">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
-                >
-                  Next
-                </a>
-              </div>
-            </nav>
+            <Pagination setPageIndex={setPageIndex} pageIndex={pageIndex} />
           </div>
         </div>
       </div>
