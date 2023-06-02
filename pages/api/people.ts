@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import paginate from "../../utils/paginate";
+import getUsers from "@/utils/helper_functions";
+import {NUM_USERS, PER_PAGE} from "../../config_params"
 
-type User = {
+export type User = {
   name: string;
   email: string;
   title: string;
@@ -14,9 +17,15 @@ type User = {
  * The endpoint should accept a query parameter "page" to return the corresponding page
  */
 
+const users = getUsers(NUM_USERS);
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<User[]>
-) {
-  res.status(200).json([]);
+) {  
+  const query = req.query;
+  const page = Number(query.currentPage);
+  const usersFinal = paginate(users, page, PER_PAGE);
+  
+  res.status(200).json(usersFinal);
 }
