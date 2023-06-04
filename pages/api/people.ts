@@ -1,25 +1,14 @@
 import { faker } from "@faker-js/faker";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { User, Response } from "../types";
 
-type User = {
-  name: string;
-  email: string;
-  title: string;
-  role: string;
-};
-
-type Response = {
-  paginatedUsers: User[];
-  paginationStartIndex: number;
-  TOTAL_USERS: number;
-};
 
 
 const USERS_PER_PAGE = 10;
 const TOTAL_USERS = 100;
 
 
-function generateUserData(): User {
+function generateUsers(): User {
   return {
     name: faker.person.fullName(),
     email: faker.internet.email(),
@@ -28,7 +17,7 @@ function generateUserData(): User {
   };
 }
 
-const userList = faker.helpers.multiple(generateUserData, {
+const userList = faker.helpers.multiple(generateUsers, {
   count: TOTAL_USERS,
 });
 
@@ -41,11 +30,6 @@ export default function handler(
 
   const paginationStartIndex = (currentPage - 1) * USERS_PER_PAGE;
   const paginationEndIndex = paginationStartIndex + USERS_PER_PAGE;
-  const totalPages = (TOTAL_USERS / USERS_PER_PAGE)
-
-  // if (currentPage < 1 || currentPage > totalPages) {
-  //   return res.status(400).json({ error: "Invalid page number" });
-  // }
 
   const sortedUsers = userList.sort((a, b) => a.name.localeCompare(b.name))
 

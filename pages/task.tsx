@@ -1,25 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { ReactElement, useState } from "react";
 import Loading from "./loading";
+import { User, Response } from "./types";
 
-
-type User = {
-  name: string;
-  email: string;
-  title: string;
-  role: string;
-};
-
-type Response = {
-  paginatedUsers: User[];
-  paginationStartIndex: number;
-  TOTAL_USERS: number;
-};
 
 export default function Task(): ReactElement {
-  const [currentPage, setCurrentPage] = useState(1);
+  
+  const [page, setPage] = useState(1);
 
-  const fetchPeople = async (page: number): Promise<Response> => {
+  const fetchUsers = async (page: number): Promise<Response> => {
     const res = await fetch(`/api/people?page=${page}`);
     if (!res.ok) {
       throw new Error(
@@ -29,16 +18,8 @@ export default function Task(): ReactElement {
     return res.json();
   };
 
-  const {
-    data,
-    isError,
-    error,
-  } = useQuery(["people", currentPage], () => fetchPeople(currentPage));
+  const {data, isError, error} = useQuery(["people", page], () => fetchUsers(page));
 
-
-  const datas = 0
-
-   console.log(data)
 
   if (isError) return <div>{error as string}</div>;
 
@@ -47,7 +28,6 @@ export default function Task(): ReactElement {
       <div className="mt-8 flow-root border` border-[#4299e1]` ">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-end sm:px-6 lg:px-8">
-            {/* align-middle to wyżej */}
             <table className="min-w-full divide-y` divide-babyblue`  pl-4">
               <thead className="bg-powderblue">
                 <tr>
@@ -59,19 +39,19 @@ export default function Task(): ReactElement {
                   </th>
                   <th
                     scope="col"
-                    className="w-[30%] px-3 py-3.5 text-left text-sm font-semibold text-gray-800"
+                    className="w-[30%] px-3 py-3.5 text-left text-sm font-semibold text-primary"
                   >
                     Title
                   </th>
                   <th
                     scope="col"
-                    className="w-[30%] px-3 py-3.5 text-left text-sm font-semibold text-gray-800"
+                    className="w-[30%] px-3 py-3.5 text-left text-sm font-semibold text-primary"
                   >
                     Email
                   </th>
                   <th
                     scope="col"
-                    className="w-[15%] px-3 py-3.5 text-left text-sm font-semibold text-gray-800"
+                    className="w-[15%] px-3 py-3.5 text-left text-sm font-semibold text-primary"
                   >
                     Role
                   </th>
@@ -85,19 +65,19 @@ export default function Task(): ReactElement {
                   data ? 
                 
                 data?.paginatedUsers.map(
-                  (person: User): ReactElement => (
-                    <tr key={person.email}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-700 sm:pl-3">
-                        {person.name}
+                  (user: User) => (
+                    <tr key={user.email}>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-td sm:pl-3">
+                        {user.name}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
-                        {person.title}
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-td">
+                        {user.title}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
-                        {person.email}
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-td">
+                        {user.email}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
-                        {person.role}
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-td">
+                        {user.role}
                       </td>
                       <td>
                         
@@ -106,15 +86,12 @@ export default function Task(): ReactElement {
                   )
                 )
                 :
-                
-                
                 <Loading/>
-                
                 }
               </tbody>
             </table>
             <nav
-              className="flex items-center justify-between p-3 bg-[#eef8f9] border border-babyblue"
+              className="flex items-center justify-between p-3 bg-whisper border border-babyblue"
               aria-label="Pagination"
             >
               <div className="hidden sm:block">
@@ -134,18 +111,18 @@ export default function Task(): ReactElement {
                 results
               </div>
               <div className="flex flex-1 justify-between sm:justify-end">
-                {currentPage > 1 && (
+                {page > 1 && (
                   <a
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-babyblue hover:bg-babyblue select-none duration-300 hover:text-black hover:cursor-pointer focus-visible:outline-offset-0"
+                    onClick={() => setPage(page - 1)}
+                    className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-babyblue hover:bg-babyblue select-none duration-300  hover:cursor-pointer focus-visible:outline-offset-0"
                   >
                     Previous
                   </a>
                 )}
-                {currentPage < 10 && (
+                {page < 10 && (
                   <a
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-babyblue duration-300 select-none hover:text-black hover:cursor-pointer hover:bg-babyblue focus-visible:outline-offset-0"
+                    onClick={() => setPage(page + 1)}
+                    className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-babyblue duration-300 select-none  hover:cursor-pointer hover:bg-babyblue focus-visible:outline-offset-0"
                   >
                     Next
                   </a>
