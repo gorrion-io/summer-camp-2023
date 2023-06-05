@@ -1,22 +1,45 @@
+import { faker } from "@faker-js/faker";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { User, Response } from "../types";
 
-type User = {
-  name: string;
-  email: string;
-  title: string;
-  role: string;
-};
 
-/**
- * TODO: Prepare an endpoint to return a list of users
- * User faker.js or similar library to generate fake data, the minimal number of users is 100
- * The endpoint should return a pagination of 10 users per page
- * The endpoint should accept a query parameter "page" to return the corresponding page
- */
+
+const USERS_PER_PAGE = 10;
+const TOTAL_USERS = 100;
+
+
+function generateUsers(): User {
+  return {
+    name: faker.person.fullName(),
+    email: faker.internet.email(),
+    title: faker.person.jobTitle(),
+    role: faker.person.jobType(),
+  };
+}
+
+const userList = faker.helpers.multiple(generateUsers, {
+  count: TOTAL_USERS,
+});
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<User[]>
+  res: NextApiResponse<Response>
 ) {
-  res.status(200).json([]);
+  const { page = "1" } = req.query;
+  const currentPage = Number(page);
+
+  const paginationStartIndex = (currentPage - 1) * USERS_PER_PAGE;
+  const paginationEndIndex = paginationStartIndex + USERS_PER_PAGE;
+
+  const sortedUsers = userList.sort((a, b) => a.name.localeCompare(b.name))
+
+  const paginatedUsers = sortedUsers.slice(paginationStartIndex, paginationEndIndex);
+
+  const response = {
+    paginatedUsers,
+    paginationStartIndex,
+    TOTAL_USERS,
+  };
+
+  res.status(200).json(response);
 }
